@@ -12,7 +12,7 @@ An end-to-end data engineering solution built on Azure, demonstrating modern clo
 This project implements a complete retail data analytics pipeline using Azure cloud services, processing data from multiple sources and delivering business insights through interactive dashboards. The solution follows industry best practices including the Medallion Architecture for data refinement and Delta Lake for reliable data storage.
 
 ## 🏗️ Architecture
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/4f8ddf11-628d-44e3-b6d9-c2250730c0da" />
+<img width="1200" height="364" alt="image" src="https://github.com/user-attachments/assets/6febec92-b37d-4c45-908e-9d628ef5189c" />
 
 ### Medallion Architecture Layers
 
