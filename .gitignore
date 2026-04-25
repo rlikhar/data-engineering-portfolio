@@ -1,4 +1,7 @@
 __pycache__/
 .env
+*.csv
 *.log
-.venv
+Flipkart_Data_Cleaning/
+nifty50_csv/
+Stock_Data_Pipeline/
