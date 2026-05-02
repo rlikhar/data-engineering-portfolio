@@ -1,0 +1,17 @@
+version: 2
+
+models:
+
+  - name: fct_customer_fraud_summary
+
+    columns:
+
+      - name: customer_id
+
+        tests:
+          - not_null
+
+      - name: total_transactions
+
+        tests:
+          - not_null

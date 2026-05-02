@@ -1,0 +1,112 @@
+# =========================
+# Python / Virtual Envs
+# =========================
+venv/
+ml_venv/
+.venv/
+env/
+ENV/
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================
+# OS / Editor / IDE
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Logs / Runtime files
+# =========================
+*.log
+logs/
+*.out
+*.err
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Spark / Delta / Streaming Runtime
+# =========================
+spark/checkpoints/
+delta/
+!delta/.gitkeep
+!delta/bronze/.gitkeep
+!delta/silver/.gitkeep
+!delta/gold/.gitkeep
+!delta/alerts/.gitkeep
+
+# =========================
+# MLflow
+# =========================
+mlruns/
+mlflow_tracking/
+artifacts/
+ml/artifacts/
+ml/models/
+
+# =========================
+# dbt
+# =========================
+dbt/fraud_analytics/target/
+dbt/fraud_analytics/dbt_packages/
+dbt/fraud_analytics/logs/
+.dbt/
+profiles.yml
+
+# =========================
+# Airflow
+# =========================
+airflow/logs/
+airflow/*.db
+airflow/*.pid
+
+# =========================
+# Docker / Compose overrides
+# =========================
+docker-compose.override.yml
+
+# =========================
+# Build / Dist
+# =========================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# =========================
+# Prometheus / Grafana runtime
+# =========================
+monitoring/*.tmp
+monitoring/*.log
+
+# =========================
+# Data handling
+# Keep only curated/small sample data in Git
+# Ignore generated or large runtime data
+# =========================
+data/raw/
+data/processed/
+data/interim/
+data/generated/
+data/output/
+
+# Keep small, important sample data tracked if needed:
+!data/sample/
+!data/sample/**
