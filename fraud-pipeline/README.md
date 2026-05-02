@@ -69,17 +69,9 @@ Synthetic Transaction Generator
 
 # 🖼️ Architecture Diagram
 
-> Add your architecture image here
-
-```text
-docs/images/architecture.png
-```
-
 <p align="center">
   <img src="docs/images/architecture.png" width="900"/>
 </p>
-
----
 
 # 🎯 Business Problem
 
@@ -442,61 +434,49 @@ The DAG orchestrates:
 
 ## Kafka Producer
 
-> Add screenshot
-
-```text
-docs/images/kafka-producer.png
-```
+<p align="center">
+  <img src="docs/images/kafka-producer.png" width="900"/>
+</p>
 
 ---
 
 ## Spark Streaming
 
-> Add screenshot
-
-```text
-docs/images/spark-streaming.png
-```
+<p align="center">
+  <img src="docs/images/spark-streaming.png" width="900"/>
+</p>
 
 ---
 
 ## Grafana Dashboard
 
-> Add screenshot
-
-```text
-docs/images/grafana-dashboard.png
-```
+<p align="center">
+  <img src="docs/images/grafana-dashboard.png" width="900"/>
+</p>
 
 ---
 
 ## MLflow Experiments
 
-> Add screenshot
-
-```text
-docs/images/mlflow-ui.png
-```
+<p align="center">
+  <img src="docs/images/mlflow-ui.png" width="900"/>
+</p>
 
 ---
 
 ## Airflow DAG
 
-> Add screenshot
-
-```text
-docs/images/airflow-dag.png
-```
+<p align="center">
+  <img src="docs/images/airflow-dag.png" width="900"/>
+</p>
 
 ---
 
 ## dbt Lineage Graph
 
-> Add screenshot
-
-```text
-docs/images/dbt-lineage.png
-```
+<p align="center">
+  <img src="docs/images/dbt-lineage.png" width="900"/>
+</p>
 
 ---
 
@@ -618,8 +598,8 @@ models/example
 
 Data Engineer | Python | Spark | Kafka | Airflow | MLflow
 
-* LinkedIn: https://linkedin.com/in/<your-profile>
-* GitHub: https://github.com/<your-username>
+* LinkedIn: https://www.linkedin.com/in/rahullikhar900
+* GitHub: https://github.com/rlikhar/data-engineering-portfolip
 
 ---
 
