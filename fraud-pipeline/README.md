@@ -230,7 +230,7 @@ fraud-pipeline/
 # 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/<your-username>/fraud-pipeline.git
+git clone https://github.com/rlikhar/data-engineering-portfolio/fraud-pipeline.git
 
 cd fraud-pipeline
 ```
