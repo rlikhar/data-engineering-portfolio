@@ -41,12 +41,12 @@ The **`Retail_Data`** directory contains an end-to-end data engineering solution
 
 ```text
 .
-├── README.md                      # Main repository documentation
-└── Retail_Data/                   # Azure Retail Data Engineering Pipeline
-    ├── Retail Sales Dashboard.pbix# Architecture diagrams and specifications
-    ├── databrick_notebook.py/     # PySpark / Delta Lake transformation notebooks
-    ├── SQL_Table.txt/             # Synapse DDL scripts and analytical queries
-    └── README.md                  # Project-specific setup and deployment guide
+├── README.md                              # Main repository documentation
+└── Retail_Data/                           # Azure Retail Data Engineering Pipeline
+    ├── Retail Sales Dashboard.pbix        # Architecture diagrams and specifications
+    ├── databrick_notebook.py/             # PySpark / Delta Lake transformation notebooks
+    ├── SQL_Table.txt/                     # Synapse DDL scripts and analytical queries
+    └── README.md                          # Project-specific setup and deployment guide
 
 ```
 
