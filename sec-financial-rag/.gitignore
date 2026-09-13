@@ -1,0 +1,24 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Configuration & Secrets
+.env
+*.pem
+*.key
+
+# Data & Storage Cache
+data/
+*.pdf
+*.html
+*.parquet
+
+# IDEs & System
+.vscode/
+.idea/
+.DS_Store
