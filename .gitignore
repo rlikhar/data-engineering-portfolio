@@ -5,3 +5,4 @@ __pycache__/
 Flipkart_Data_Cleaning/
 nifty50_csv/
 Stock_Data_Pipeline/
+.venv/
