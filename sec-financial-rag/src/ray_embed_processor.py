@@ -1,5 +1,6 @@
 import os
 import io
+import time
 import uuid
 import ray
 from typing import List, Dict, Any
@@ -10,7 +11,10 @@ from qdrant_client.http import models
 from sentence_transformers import SentenceTransformer
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-# Configuration
+# --- PROMETHEUS METRIC IMPORTS ---
+from src.metrics import start_metrics_server, CHUNKS_UPSERTED, RAY_PROCESSING_LATENCY, EMBEDDING_TOKENS_CONSUMED
+
+# --- CONFIGURATION ---
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "localhost:9000")
 MINIO_ACCESS_KEY = os.getenv("MINIO_ROOT_USER", "minioadmin")
 MINIO_SECRET_KEY = os.getenv("MINIO_ROOT_PASSWORD", "minioadminpassword")
@@ -32,7 +36,9 @@ class EmbeddingWorker:
             separators=["\n\n", "\n", " ", ""]
         )
 
-    def process_and_embed_document(self, html_content: str, metadata: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def process_and_embed_document(self, html_content: str, metadata: Dict[str, Any]) -> Dict[str, Any]:
+        start_time = time.time()
+        
         # 1. Clean HTML to raw text
         soup = BeautifulSoup(html_content, "html.parser")
         text = soup.get_text(separator=" ")
@@ -40,12 +46,16 @@ class EmbeddingWorker:
         # 2. Semantic Chunking
         chunks = self.text_splitter.split_text(text)
         if not chunks:
-            return []
+            return {"records": [], "duration": time.time() - start_time, "token_count": 0}
 
         # 3. Batch Compute Embeddings
         embeddings = self.model.encode(chunks, batch_size=32, show_progress_bar=False).tolist()
 
-        # 4. Return formatted vector payload list
+        duration = time.time() - start_time
+        total_words = sum(len(c.split()) for c in chunks)
+        approx_tokens = int(total_words * 1.3)
+
+        # 4. Format vector records
         records = []
         for idx, (chunk_text, vector) in enumerate(zip(chunks, embeddings)):
             record = {
@@ -61,7 +71,12 @@ class EmbeddingWorker:
                 }
             }
             records.append(record)
-        return records
+
+        return {
+            "records": records,
+            "duration": duration,
+            "token_count": approx_tokens
+        }
 
 # --- MAIN CONTROLLER ENGINE ---
 def run_distributed_embedding_job():
@@ -75,7 +90,7 @@ def run_distributed_embedding_job():
         secret_key=MINIO_SECRET_KEY,
         secure=False
     )
-    qdrant_client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
+    qdrant_client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT, check_compatibility=False)
 
     # List files from S3 Lakehouse
     objects = list(minio_client.list_objects(BUCKET_NAME, recursive=True))
@@ -86,10 +101,12 @@ def run_distributed_embedding_job():
     print(f"Found {len(objects)} raw documents in S3 data lake.")
 
     # Spawn Ray Worker Pool
-    num_workers = min(4, os.cpu_count() or 2)
+    num_workers = 1
     workers = [EmbeddingWorker.remote() for _ in range(num_workers)]
     
     futures = []
+    doc_metadata_list = []
+
     for idx, obj in enumerate(objects):
         # Extract partition keys: raw/year=2024/ticker=AAPL/...
         parts = obj.object_name.split("/")
@@ -103,13 +120,14 @@ def run_distributed_embedding_job():
             "accession_number": accession,
             "form_type": "10-K"
         }
+        doc_metadata_list.append(metadata)
 
         # Read object from MinIO
         response = minio_client.get_object(BUCKET_NAME, obj.object_name)
         html_content = response.read().decode("utf-8")
         response.close()
 
-        # Dispatch round-robin task to Ray Worker Actor
+        # Dispatch task to Ray Worker Actor
         worker = workers[idx % num_workers]
         future = worker.process_and_embed_document.remote(html_content, metadata)
         futures.append(future)
@@ -118,9 +136,17 @@ def run_distributed_embedding_job():
     print("[Ray] Processing chunks and embeddings concurrently...")
     results = ray.get(futures)
 
-    # Flatten and Upsert into Qdrant Vector DB
+    # Flatten, record metrics, and Upsert into Qdrant Vector DB
     total_vectors = 0
-    for doc_records in results:
+    for res_dict, meta in zip(results, doc_metadata_list):
+        doc_records = res_dict["records"]
+        duration = res_dict["duration"]
+        tokens = res_dict["token_count"]
+
+        # Record Metrics safely on Driver side
+        RAY_PROCESSING_LATENCY.labels(ticker=meta["ticker"]).observe(duration)
+        EMBEDDING_TOKENS_CONSUMED.labels(model="all-MiniLM-L6-v2").inc(tokens)
+
         if not doc_records:
             continue
         
@@ -138,10 +164,23 @@ def run_distributed_embedding_job():
             collection_name=COLLECTION_NAME,
             points=points
         )
+        
+        # Record Metric: Chunks upserted count per ticker and year
+        CHUNKS_UPSERTED.labels(ticker=meta["ticker"], year=meta["year"]).inc(len(points))
         total_vectors += len(points)
 
     print(f"\n✅ Pipeline Complete! Upserted {total_vectors} vectors into Qdrant collection '{COLLECTION_NAME}'.")
     ray.shutdown()
 
 if __name__ == "__main__":
+    # Start Prometheus metrics server on port 8001
+    start_metrics_server(port=8001)
+
     run_distributed_embedding_job()
+
+    print("\n[Metrics] Processing complete. Keeping Prometheus metrics server alive on port 8001...")
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("Stopping Ray metrics server.")
